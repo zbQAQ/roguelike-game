@@ -1,9 +1,9 @@
-import { mapRecoil, basicRecoil, playerRecoil } from '@/recoil';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { basicRecoil, playerRecoil } from '@/recoil';
+import React, { useEffect, useRef } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { useEventListener, useInterval } from 'usehooks-ts';
+import { useInterval } from 'usehooks-ts';
 import useKeyboardStatus from '@/hook/useKeyboardStatus';
-import useMapComponents from '@/hook/useMapComponents';
+// import useMapComponents from '@/hook/useMapComponents';
 import usePainter from '@/hook/usePainter';
 import useCtxState from '@/hook/useCtxState';
 import { FRAME_RATE } from '@/constant';
@@ -13,10 +13,10 @@ const PlayContainer = () => {
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const [ctx, setCtx] = useCtxState();
   const { winH, winW } = useRecoilValue(basicRecoil);
-  const [state, setState] = useRecoilState(playerRecoil);
+  const [, setState] = useRecoilState(playerRecoil);
   const { mainCharacter } = usePlayComponents();
   const { up, right, down, left } = useKeyboardStatus();
-  const { x, y, width, height } = state;
+  // const { x, y, width, height } = state;
 
   usePainter(ctx, mainCharacter);
 

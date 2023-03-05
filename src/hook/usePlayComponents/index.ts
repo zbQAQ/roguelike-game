@@ -1,12 +1,15 @@
-import { playerRecoil } from '@/recoil';
+import { palyerCenterPointSelector, playerRecoil } from '@/recoil';
 import { useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
-import { drawRect } from '@/utils';
+import { drawLine, drawRect } from '@/utils';
 import { ICtxType } from '@/constant';
+import useMousePosition from '@/hook/useMousePosition';
 
 const usePlayComponents = () => {
   // const { winH, winW } = useRecoilValue(basicRecoil);
   const { x, y, height, width, color } = useRecoilValue(playerRecoil);
+  const { x: centerX, y: centerY } = useRecoilValue(palyerCenterPointSelector);
+  const { x: mouseX, y: mouseY } = useMousePosition();
 
   const mainCharacter = useCallback(
     (ctx: ICtxType) => {
@@ -14,11 +17,21 @@ const usePlayComponents = () => {
 
       drawRect(ctx, x, y, width, height, 0, color, 'fill');
     },
-    [x, y, height, width, color],
+    [x, y, height, width, color]
+  );
+
+  const lineOfSight = useCallback(
+    (ctx: ICtxType) => {
+      if (!ctx) return;
+
+      drawLine(ctx, centerX, centerY, mouseX, mouseY, 'red', 'stroke');
+    },
+    [centerX, centerY, mouseX, mouseY]
   );
 
   return {
     mainCharacter,
+    lineOfSight,
   };
 };
 

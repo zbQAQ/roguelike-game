@@ -11,18 +11,13 @@ import usePlayComponents from '@/hook/usePlayComponents';
 
 const PlayContainer = () => {
   const canvas = useRef<HTMLCanvasElement | null>(null);
-  const [ctx, setCtx] = useCtxState();
+  const [ctx] = useCtxState(canvas);
   const { winH, winW } = useRecoilValue(basicRecoil);
   const [, setState] = useRecoilState(playerRecoil);
-  const { mainCharacter } = usePlayComponents();
+  const { mainCharacter, lineOfSight } = usePlayComponents();
   const { up, right, down, left } = useKeyboardStatus();
-  // const { x, y, width, height } = state;
 
-  usePainter(ctx, mainCharacter);
-
-  useEffect(() => {
-    setCtx(canvas.current ? canvas.current.getContext('2d') : null);
-  }, [canvas, setCtx]);
+  usePainter(ctx, mainCharacter, lineOfSight);
 
   useEffect(() => {
     setState((pre) => {
@@ -69,8 +64,8 @@ const PlayContainer = () => {
 
   return (
     <canvas
-      className='canvas-container'
-      id='player-container'
+      className="canvas-container"
+      id="player-container"
       ref={canvas}
       width={winW}
       height={winH}

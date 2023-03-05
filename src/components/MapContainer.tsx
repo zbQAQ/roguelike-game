@@ -8,7 +8,7 @@ import recoilMergeSetter from '@/utils/recoilMergeSetter';
 
 const MapContainer = () => {
   const canvas = useRef<HTMLCanvasElement | null>(null);
-  const [ctx, setCtx] = useCtxState();
+  const [ctx, setCtx] = useCtxState(canvas);
   const { winH, winW } = useRecoilValue(basicRecoil);
   const [, setMapState] = useRecoilState(mapRecoil);
   const { mapBackgrounpComponets } = useMapComponents();
@@ -16,17 +16,13 @@ const MapContainer = () => {
   usePainter(ctx, mapBackgrounpComponets);
 
   useEffect(() => {
-    setCtx(canvas.current ? canvas.current.getContext('2d') : null);
-  }, [canvas, setCtx]);
-
-  useEffect(() => {
     recoilMergeSetter(setMapState, { width: winW, height: winH });
   }, [winH, winW, setMapState]);
 
   return (
     <canvas
-      className='canvas-container'
-      id='map-container'
+      className="canvas-container"
+      id="map-container"
       ref={canvas}
       width={winW}
       height={winH}

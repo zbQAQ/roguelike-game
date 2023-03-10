@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 
 import { useEventListener } from 'usehooks-ts';
+import useMergeState from './useMergeState';
 
 const useKeyboardStatus = () => {
   // false: 未按下;  true: 按下;
-  const [controlKeySataus, setControlKeyStatus] = useState({
+  const [controlKeySataus, setControlKeyStatus] = useMergeState({
     ArrowRight: false,
     ArrowLeft: false,
     ArrowUp: false,
@@ -18,22 +19,22 @@ const useKeyboardStatus = () => {
     switch (code) {
       case 'ArrowRight':
       case 'KeyD':
-        setControlKeyStatus((oldVal) => ({ ...oldVal, ArrowRight: status }));
+        setControlKeyStatus({ ArrowRight: status });
         break;
       case 'ArrowLeft':
       case 'KeyA':
-        setControlKeyStatus((oldVal) => ({ ...oldVal, ArrowLeft: status }));
+        setControlKeyStatus({ ArrowLeft: status });
         break;
       case 'ArrowUp':
       case 'KeyW':
-        setControlKeyStatus((oldVal) => ({ ...oldVal, ArrowUp: status }));
+        setControlKeyStatus({ ArrowUp: status });
         break;
       case 'ArrowDown':
       case 'KeyS':
-        setControlKeyStatus((oldVal) => ({ ...oldVal, ArrowDown: status }));
+        setControlKeyStatus({ ArrowDown: status });
         break;
       case 'Space':
-        setControlKeyStatus((oldVal) => ({ ...oldVal, Space: status }));
+        setControlKeyStatus({ Space: status });
         break;
     }
   }, []);
@@ -42,14 +43,14 @@ const useKeyboardStatus = () => {
     (e: KeyboardEvent) => {
       handleKeyEvent(e, false);
     },
-    [handleKeyEvent],
+    [handleKeyEvent]
   );
 
   const KeyDownEventListener = useCallback(
     (e: KeyboardEvent) => {
       handleKeyEvent(e, true);
     },
-    [handleKeyEvent],
+    [handleKeyEvent]
   );
 
   useEventListener('keydown', KeyDownEventListener);

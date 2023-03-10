@@ -2,7 +2,6 @@ import { palyerCenterPointSelector, playerRecoil } from '@/recoil';
 import { useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
 import { drawLine, drawRect } from '@/utils';
-import { ICtxType } from '@/constant';
 import useMousePosition from '@/hook/useMousePosition';
 
 const usePlayComponents = () => {

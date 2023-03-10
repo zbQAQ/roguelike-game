@@ -1,4 +1,3 @@
-import { ICtxType } from '@/constant';
 import { DependencyList, useCallback } from 'react';
 
 const useCtxRenderer = (callback: any, deps: DependencyList) => {

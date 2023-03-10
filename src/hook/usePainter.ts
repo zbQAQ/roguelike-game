@@ -1,4 +1,3 @@
-import { ICtxType } from '@/constant';
 import { basicRecoil } from '@/recoil';
 import { useCallback, useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
@@ -10,7 +9,7 @@ const usePainter = (
   const { winH, winW } = useRecoilValue(basicRecoil);
 
   const painter = useCallback(() => {
-    if (ctx) {
+    if (ctx && componentsRender.length) {
       ctx.clearRect(0, 0, winW, winH);
       [...componentsRender].forEach((render) => {
         render(ctx);

@@ -1,0 +1,11 @@
+.fps-container {
+  position: fixed;
+  top: 2px;
+  left: 2px;
+  color: #68b862;
+  background: #00000059;
+  padding: 2px 4px;
+  font-size: 12px;
+  user-select: none;
+  pointer-events: none;
+}

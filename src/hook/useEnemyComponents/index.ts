@@ -1,10 +1,14 @@
-import { FRAME_RATE, ICtxType } from '@/constant';
+import { FRAME_RATE } from '@/constant';
 import {
   basicRecoil,
   palyerCenterPointSelector,
   palyerRectPropertySelector,
 } from '@/recoil';
-import { enemyCountSelector, enemyFormationAtom } from '@/recoil/enemy';
+import {
+  enemyCountSelector,
+  enemyFormationAtom,
+  enemyFormationToArraySelector,
+} from '@/recoil/enemy';
 import { drawRect, impackDetectOfObjects } from '@/utils';
 import { useCallback } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -14,8 +18,8 @@ import { v4 as uuid } from 'uuid';
 import { isOverlap } from '@/utils';
 
 const useEnemyComponents = () => {
-  const COUNT = 500;
-  const [enemys, setEenemys] = useRecoilState(enemyFormationAtom);
+  const COUNT = 10;
+  const [enemys, setEnemys] = useRecoilState(enemyFormationAtom);
   const enemyCount = useRecoilValue(enemyCountSelector);
   const { winH, winW } = useRecoilValue(basicRecoil);
   const { x: playerCenterX, y: playerCenterY } = useRecoilValue(
@@ -45,10 +49,10 @@ const useEnemyComponents = () => {
   );
 
   // useInterval(() => {
-  //   setEenemys((enemys) => {
-  //     const newEnemys = [...enemys];
-  //     for (let i = 0; i < newEnemys.length; i++) {
-  //       const enemy = newEnemys[i];
+  //   setEnemys((enemys) => {
+  //     const newEnemysArray = Object.values(enemyFormation);
+  //     for (let i = 0; i < newEnemysArray.length; i++) {
+  //       const enemy = newEnemysArray[i];
   //       if (isOverlap(enemy, playerProperty)) {
   //         continue;
   //       }
@@ -69,7 +73,7 @@ const useEnemyComponents = () => {
 
   //       const { flag: overlap, direction: overlapDir } = impackDetectOfObjects(
   //         newEnemy,
-  //         enemys.filter((i) => i.id !== enemy.id && i.speed === 0)
+  //         newEnemysArray.filter((i) => i.id !== enemy.id && i.speed === 0)
   //       );
 
   //       if (overlap) {
@@ -84,15 +88,19 @@ const useEnemyComponents = () => {
   //         }
   //       }
 
-  //       newEnemys[i] = newEnemy;
+  //       newEnemysArray[i] = newEnemy;
   //     }
-  //     return newEnemys;
+  //     const result: any = {};
+  //     for (let i = 0; i < newEnemysArray.length; i++) {
+  //       result[newEnemysArray[i].id] = newEnemysArray[i];
+  //     }
+  //     return result;
   //   });
   // }, FRAME_RATE);
 
   useInterval(
     () => {
-      setEenemys((pre) => {
+      setEnemys((pre) => {
         const id = uuid();
         return {
           ...pre,

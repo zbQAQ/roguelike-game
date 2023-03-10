@@ -4,7 +4,11 @@ interface IAnyAction<T> extends IActionType<T> {
   [extraProps: string]: any;
 }
 
+type ICtxType = CanvasRenderingContext2D | null;
+
 interface IWindowSize {
   winH: number;
   winW: number;
 }
+
+type ValueOf<T> = T[keyof T];

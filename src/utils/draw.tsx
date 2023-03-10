@@ -1,5 +1,3 @@
-type ICtxType = CanvasRenderingContext2D;
-
 const getDrawStyle = (type: 'fill' | 'stroke') => {
   switch (type) {
     case 'fill': {
@@ -24,6 +22,7 @@ export const drawRect = (
   color: string,
   type: 'fill' | 'stroke'
 ) => {
+  if (!ctx) return;
   ctx.beginPath();
   ctx.moveTo(x, y + radius);
   ctx.lineTo(x, y + height - radius);
@@ -48,6 +47,7 @@ export const drawLine = (
   color: string,
   type: 'fill' | 'stroke'
 ) => {
+  if (!ctx) return;
   ctx.beginPath();
   ctx.moveTo(startX, startY);
   ctx.lineTo(endX, endY);

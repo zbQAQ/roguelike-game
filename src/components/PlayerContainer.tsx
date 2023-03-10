@@ -1,21 +1,30 @@
-import { basicRecoil, playerRecoil } from '@/recoil';
+import { basicRecoil, palyerCenterPointSelector, playerRecoil } from '@/recoil';
 import React, { useEffect, useRef } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { useInterval } from 'usehooks-ts';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useEventListener, useInterval } from 'usehooks-ts';
 import useKeyboardStatus from '@/hook/useKeyboardStatus';
 // import useMapComponents from '@/hook/useMapComponents';
 import usePainter from '@/hook/usePainter';
 import useCtxState from '@/hook/useCtxState';
-import { FRAME_RATE } from '@/constant';
+import { FRAME_RATE, PLAYER_SHOOT, THROWING_OBJECT_TYPE } from '@/constant';
 import usePlayComponents from '@/hook/usePlayComponents';
+import useMouseClickStatus from '@/hook/useMouseClickStatus';
+import { useCustomEventTrigger } from '@/hook/useCustomEvent';
+import useMousePosition from '@/hook/useMousePosition';
 
 const PlayContainer = () => {
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const [ctx] = useCtxState(canvas);
   const { winH, winW } = useRecoilValue(basicRecoil);
-  const [, setState] = useRecoilState(playerRecoil);
+  const setState = useSetRecoilState(playerRecoil);
+  const { x: playerCenterX, y: playerCenterY } = useRecoilValue(
+    palyerCenterPointSelector
+  );
   const { mainCharacter, lineOfSight } = usePlayComponents();
   const { up, right, down, left } = useKeyboardStatus();
+  const { status: mouseStatus } = useMouseClickStatus();
+  const mousePosition = useMousePosition();
+  const shootTrigger = useCustomEventTrigger();
 
   usePainter(ctx, mainCharacter, lineOfSight);
 
@@ -61,6 +70,19 @@ const PlayContainer = () => {
       }));
     }
   }, FRAME_RATE);
+
+  // player shoot
+  useInterval(
+    () => {
+      shootTrigger(PLAYER_SHOOT, {
+        x: playerCenterX,
+        y: playerCenterY,
+        type: THROWING_OBJECT_TYPE.BULLET,
+        mousePosition,
+      });
+    },
+    mouseStatus ? 500 : null
+  );
 
   return (
     <canvas

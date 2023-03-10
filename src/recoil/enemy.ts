@@ -15,6 +15,14 @@ export const enemyFormationAtom = atom<Record<string, IEnemyStateType>>({
   default: {},
 });
 
+export const enemyFormationToArraySelector = selector<IEnemyStateType[]>({
+  key: 'enemyFormationToArraySelector',
+  get: ({ get }) => {
+    const enemyFormation = get(enemyFormationAtom);
+    return Object.values(enemyFormation);
+  },
+});
+
 export const enemySelector = selectorFamily<IEnemyStateType, string>({
   key: 'enemySelector',
   get:

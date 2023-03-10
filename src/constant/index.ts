@@ -7,4 +7,8 @@ export const MAP_MAX_HEIGHT = 3000;
 // 帧率
 export const FRAME_RATE = 1000 / 60;
 
-export type ICtxType = CanvasRenderingContext2D | null;
+export const THROWING_OBJECT_TYPE = {
+  BULLET: 'bullet',
+} as const;
+
+export * from './customEventKey';

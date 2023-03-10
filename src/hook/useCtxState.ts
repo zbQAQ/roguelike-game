@@ -1,4 +1,3 @@
-import { ICtxType } from '@/constant';
 import { useEffect, useState, MutableRefObject } from 'react';
 
 const useCtxState = (canvas: MutableRefObject<HTMLCanvasElement | null>) => {

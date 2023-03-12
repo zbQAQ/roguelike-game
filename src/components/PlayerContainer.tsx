@@ -1,5 +1,5 @@
 import { basicRecoil, palyerCenterPointSelector, playerRecoil } from '@/recoil';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useEventListener, useInterval } from 'usehooks-ts';
 import useKeyboardStatus from '@/hook/useKeyboardStatus';
@@ -7,46 +7,46 @@ import useKeyboardStatus from '@/hook/useKeyboardStatus';
 import usePainter from '@/hook/usePainter';
 import useCtxState from '@/hook/useCtxState';
 import { FRAME_RATE, PLAYER_SHOOT, THROWING_OBJECT_TYPE } from '@/constant';
-import usePlayComponents from '@/hook/usePlayComponents';
 import useMouseClickStatus from '@/hook/useMouseClickStatus';
 import { useCustomEventTrigger } from '@/hook/useCustomEvent';
 import useMousePosition from '@/hook/useMousePosition';
+import { Line, Rect } from 'react-konva';
 
 const PlayContainer = () => {
-  const canvas = useRef<HTMLCanvasElement | null>(null);
-  const [ctx] = useCtxState(canvas);
   const { winH, winW } = useRecoilValue(basicRecoil);
-  const setState = useSetRecoilState(playerRecoil);
+  const [playerState, setPlayerState] = useRecoilState(playerRecoil);
   const { x: playerCenterX, y: playerCenterY } = useRecoilValue(
     palyerCenterPointSelector
   );
-  const { mainCharacter, lineOfSight } = usePlayComponents();
   const { up, right, down, left } = useKeyboardStatus();
   const { status: mouseStatus } = useMouseClickStatus();
   const mousePosition = useMousePosition();
-  const shootTrigger = useCustomEventTrigger();
+  const eventTrigger = useCustomEventTrigger();
 
-  usePainter(ctx, mainCharacter, lineOfSight);
+  const lineOfSightPointers = useMemo(
+    () => [playerCenterX, playerCenterY, mousePosition.x, mousePosition.y],
+    [playerCenterX, playerCenterY, mousePosition]
+  );
 
   useEffect(() => {
-    setState((pre) => {
+    setPlayerState((pre) => {
       return {
         ...pre,
         x: winW / 2 - pre.width / 2,
         y: winH / 2 - pre.height / 2,
       };
     });
-  }, [winH, winW, setState]);
+  }, [winH, winW, setPlayerState]);
 
   useInterval(() => {
     if (up) {
-      setState((pre) => ({
+      setPlayerState((pre) => ({
         ...pre,
         y: pre.y - pre.speed <= 0 ? 0 : pre.y - pre.speed,
       }));
     }
     if (right) {
-      setState((pre) => ({
+      setPlayerState((pre) => ({
         ...pre,
         x:
           pre.x + pre.speed >= winW - pre.width
@@ -55,7 +55,7 @@ const PlayContainer = () => {
       }));
     }
     if (down) {
-      setState((pre) => ({
+      setPlayerState((pre) => ({
         ...pre,
         y:
           pre.y + pre.speed >= winH - pre.height
@@ -64,7 +64,7 @@ const PlayContainer = () => {
       }));
     }
     if (left) {
-      setState((pre) => ({
+      setPlayerState((pre) => ({
         ...pre,
         x: pre.x - pre.speed <= 0 ? 0 : pre.x - pre.speed,
       }));
@@ -74,24 +74,28 @@ const PlayContainer = () => {
   // player shoot
   useInterval(
     () => {
-      shootTrigger(PLAYER_SHOOT, {
+      eventTrigger(PLAYER_SHOOT, {
         x: playerCenterX,
         y: playerCenterY,
         type: THROWING_OBJECT_TYPE.BULLET,
         mousePosition,
       });
     },
-    mouseStatus ? 500 : null
+    mouseStatus ? 200 : null
   );
 
   return (
-    <canvas
-      className="canvas-container"
-      id="player-container"
-      ref={canvas}
-      width={winW}
-      height={winH}
-    ></canvas>
+    <>
+      <Rect
+        x={playerState.x}
+        y={playerState.y}
+        width={playerState.width}
+        height={playerState.height}
+        fill={playerState.color}
+        shadowBlur={5}
+      />
+      <Line x={0} y={0} stroke="red" points={lineOfSightPointers} />
+    </>
   );
 };
 

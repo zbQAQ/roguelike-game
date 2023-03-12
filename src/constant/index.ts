@@ -11,4 +11,8 @@ export const THROWING_OBJECT_TYPE = {
   BULLET: 'bullet',
 } as const;
 
+export const ENEMY_TYPE = {
+  TRACKER: 'tracker',
+} as const;
+
 export * from './customEventKey';

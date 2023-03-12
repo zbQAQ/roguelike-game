@@ -1,80 +1,43 @@
 import { mapRecoil, basicRecoil } from '@/recoil';
 import React, { useEffect, useRef, useState } from 'react';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import useMapComponents from '@/hook/useMapComponents';
 import useCtxState from '@/hook/useCtxState';
 import usePainter from '@/hook/usePainter';
 import recoilMergeSetter from '@/utils/recoilMergeSetter';
 import useKeyboardStatus from '@/hook/useKeyboardStatus';
 import { useClickAnyWhere } from 'usehooks-ts';
 import { useCustomEventListener } from '@/hook/useCustomEvent';
-import { PLAYER_SHOOT } from '@/constant';
-import {
-  throwingObjectFormationAtom,
-  throwingObjectFormationToArraySelector,
-} from '@/recoil/throwingObject';
+import { PLAYER_SHOOT, THROWING_OBJECT_REMOVE } from '@/constant';
+import { throwingObjectFormationAtom } from '@/recoil/throwingObject';
 import ThrowingObjectItem from './ThrowingObjectItem';
 import { v4 as uuidv4 } from 'uuid';
-import useThrowingObjectComponents from '@/hook/useThrowingObjectComponents';
 
 const ThrowingObjectContainer = () => {
-  const canvas = useRef<HTMLCanvasElement | null>(null);
-  const setThrowingObjectFormationState = useSetRecoilState(
+  const [throwingObjectFormation, setThrowingObjectFormation] = useRecoilState(
     throwingObjectFormationAtom
   );
-
-  const throwingObjectFormationArray = useRecoilValue(
-    throwingObjectFormationToArraySelector
-  );
-
-  const [shootStatus, setShootStatus] = useState(false);
-  const [ctx, setCtx] = useCtxState(canvas);
-  const { winH, winW } = useRecoilValue(basicRecoil);
-
-  const { throwingObjectsFormation } = useThrowingObjectComponents();
-
-  usePainter(ctx, throwingObjectsFormation);
-
   useCustomEventListener(PLAYER_SHOOT, (e) => {
-    const { x, y, type } = e.detail;
-    // create player throwing object
-    // console.log('PLAYER_SHOOT', { x, y, type }, mousePosition);
-    const angle = Math.atan2(x - winW / 2, y - winH / 2);
+    const { x, y, type, mousePosition } = e.detail;
 
-    setThrowingObjectFormationState((pre) => {
+    const angle = Math.atan2(y - mousePosition.y, x - mousePosition.x);
+
+    setThrowingObjectFormation((pre) => {
       const id = uuidv4();
-      return {
-        ...pre,
-        [id]: {
-          id,
-          x,
-          y,
-          type,
-          width: 5,
-          height: 10,
-          color: 'red',
-          // 速度;
-          velocity: {
-            x: Math.cos(angle),
-            y: Math.sin(angle),
-          },
-        },
-      };
+      return [...pre, `${id}/t:${type},x:${x},y:${y},angle:${angle}`];
     });
+  });
+
+  useCustomEventListener(THROWING_OBJECT_REMOVE, (e) => {
+    const { id } = e.detail;
+
+    setThrowingObjectFormation((pre) => pre.filter((item) => item !== id));
   });
 
   return (
     <>
-      {throwingObjectFormationArray.map((item) => (
-        <ThrowingObjectItem key={item.id} {...item} />
+      {throwingObjectFormation.map((id) => (
+        <ThrowingObjectItem key={id} id={id} />
       ))}
-      <canvas
-        className="canvas-container"
-        id="throwing-object-container"
-        ref={canvas}
-        width={winW}
-        height={winH}
-      ></canvas>
     </>
   );
 };

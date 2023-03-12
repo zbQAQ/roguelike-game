@@ -1,39 +1,60 @@
-import { FRAME_RATE } from '@/constant';
+import { FRAME_RATE, THROWING_OBJECT_REMOVE } from '@/constant';
 import usePainter from '@/hook/usePainter';
-import useBulletObjectComponents from '@/hook/useThrowingObjectComponents/useBulletObjectComponents';
 import {
   IThrowingObject,
-  throwingObjectSelectorFamily,
+  throwingObjectAtomFamily,
 } from '@/recoil/throwingObject';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
+import { Circle, Rect } from 'react-konva';
 import { useRecoilState } from 'recoil';
 import { useInterval } from 'usehooks-ts';
+import React from 'react';
+import useEdgeDetector from '@/hook/useEdgeDetector';
+import { useCustomEventTrigger } from '@/hook/useCustomEvent';
 
-interface IProps extends IThrowingObject {}
+interface IProps {
+  id: string;
+}
 
 const ThrowingObjectItem: FC<IProps> = (props) => {
   const { id } = props;
   const [currentThrowingObject, setCurrentThrowingObject] = useRecoilState(
-    throwingObjectSelectorFamily(id)
+    throwingObjectAtomFamily(id)
   );
 
-  // console.log('ThrowingObjectItem', props);
-  // const { throwingObjectRenderer } = useBulletObjectComponents(id);
+  const edgeDetector = useEdgeDetector();
+  const eventTrigger = useCustomEventTrigger();
 
-  // usePainter(ctx, throwingObjectRenderer);
+  const { x, y, width, height, color, death } = currentThrowingObject;
 
-  useInterval(() => {
-    setCurrentThrowingObject((preValue) => {
-      const { x, y, velocity } = preValue;
-      return {
-        ...preValue,
-        x: x + velocity.x,
-        y: y + velocity.y,
-      };
-    });
-  }, FRAME_RATE);
+  useEffect(() => {
+    if (death) {
+      eventTrigger(THROWING_OBJECT_REMOVE, { id });
+    }
+  }, [death, eventTrigger, id]);
 
-  return null;
+  useInterval(
+    () => {
+      setCurrentThrowingObject((preValue) => {
+        const { x, y, width, height, velocity } = preValue;
+        const newX = x + velocity.x;
+        const newY = y + velocity.y;
+        return {
+          ...preValue,
+          x: newX,
+          y: newY,
+          death: edgeDetector(newX, newY, width, height),
+        };
+      });
+    },
+    death ? null : FRAME_RATE
+  );
+
+  if (death) {
+    return null;
+  }
+
+  return <Circle x={x} y={y} fill={color} radius={width} />;
 };
 
 export default ThrowingObjectItem;

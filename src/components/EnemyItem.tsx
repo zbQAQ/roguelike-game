@@ -43,8 +43,8 @@ const EnemyItem: FC<IProps> = (props) => {
         const dx = playerCenterX - x;
         const dy = playerCenterY - y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        let unitX = dx / distance;
-        let unitY = dy / distance;
+        const unitX = dx / distance;
+        const unitY = dy / distance;
         const newX = x + unitX * speed;
         const newY = y + unitY * speed;
 

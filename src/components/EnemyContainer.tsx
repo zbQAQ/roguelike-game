@@ -12,7 +12,7 @@ import { random } from 'lodash';
 import { ENEMY_TYPE } from '@/constant';
 
 const EnemyContainer = () => {
-  const enemyCount = 100;
+  const enemyCount = 50;
   const { winH, winW } = useRecoilValue(basicRecoil);
 
   const [enemyFormation, setEnemyFormation] =
@@ -23,10 +23,9 @@ const EnemyContainer = () => {
       const x = random(0, winW - 30);
       const y = random(0, winH - 30);
       const newId = ObjectIdCreator({ type: ENEMY_TYPE.TRACKER, x, y });
-      console.log('newId', newId);
       setEnemyFormation((pre) => [...pre, newId]);
     },
-    enemyFormation.length >= enemyCount ? null : 500
+    enemyFormation.length >= enemyCount ? null : 50
   );
 
   return (
